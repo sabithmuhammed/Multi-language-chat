@@ -1,0 +1,23 @@
+import { Paperclip, Send } from "lucide-react";
+
+const ChatInputSection = () => {
+    return (
+        <div className="shrink-0 w-full h-[60px]  flex gap-1 items-center mx-auto max-w-[600px]">
+            <div className="grow bg-zinc-700 h-[50px] rounded-xl flex items-center px-1.5 gap-2">
+                <span className="w-[40px] h-[40px] bg-zinc-600 flex rounded-xl justify-center items-center">
+                    <Paperclip color="#ffffff" strokeWidth={1} />
+                </span>
+                <input
+                    type="text"
+                    className="grow h-full focus:outline-none text-white"
+                    placeholder="Type something..."
+                />
+            </div>
+            <div className="w-[50px] h-[50px] rounded-xl bg-zinc-700 flex items-center justify-center">
+                <Send color="#ffffff" strokeWidth={1} />
+            </div>
+        </div>
+    );
+};
+
+export default ChatInputSection;
