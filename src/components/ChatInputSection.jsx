@@ -1,6 +1,6 @@
 import { Paperclip, Send } from "lucide-react";
 
-const ChatInputSection = () => {
+const ChatInputSection = ({ message, handleSetMessage, sendMessage }) => {
     return (
         <div className="shrink-0 w-full h-[60px]  flex gap-1 items-center mx-auto max-w-[600px]">
             <div className="grow bg-zinc-700 h-[50px] rounded-xl flex items-center px-1.5 gap-2">
@@ -11,11 +11,21 @@ const ChatInputSection = () => {
                     type="text"
                     className="grow h-full focus:outline-none text-white"
                     placeholder="Type something..."
+                    value={message}
+                    onChange={(e) => handleSetMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            sendMessage();
+                        }
+                    }}
                 />
             </div>
-            <div className="w-[50px] h-[50px] rounded-xl bg-zinc-700 flex items-center justify-center">
+            <button
+                onClick={sendMessage}
+                className="w-[50px] h-[50px] rounded-xl bg-zinc-700 flex items-center justify-center cursor-pointer"
+            >
                 <Send color="#ffffff" strokeWidth={1} />
-            </div>
+            </button>
         </div>
     );
 };
