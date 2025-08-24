@@ -1,12 +1,20 @@
 import React, { useState } from "react";
 import { login, signup } from "../apis/userApis";
+import useAuthStore from "../store/authStore";
+import useSocketStore from "../store/socketStore";
 
-const Login = ({ handleUserChange }) => {
+const Login = () => {
+    const setUser = useAuthStore((store) => store.setUser);
+    const initSocket = useSocketStore((store) => store.initSocket);
     const [info, setInfo] = useState({
         isLogin: true,
         username: "",
         password: "",
+        email: "",
         error: "",
+        passwordError: "",
+        usernameError: "",
+        emailError: "",
     });
     const handleInfoChange = (data) => {
         setInfo((prevInfo) => ({ ...prevInfo, ...data }));
@@ -14,26 +22,39 @@ const Login = ({ handleUserChange }) => {
     const handleLogin = async () => {
         let passwordError = "";
         let usernameError = "";
-        handleInfoChange({ error: "", passwordError: "", usernameError: "" });
-        const { username, password, isLogin } = info;
+        let emailError = "";
+        handleInfoChange({
+            error: "",
+            passwordError: "",
+            usernameError: "",
+            emailError: "",
+        });
+        const { username, password, isLogin, email } = info;
         if (username?.trim()?.length < 6) {
             usernameError = "Username must be 6 charecters long";
         }
         if (password?.trim()?.length < 6) {
             passwordError = "password must be 6 charecters long";
         }
-        if (passwordError || usernameError) {
-            handleInfoChange({ passwordError, usernameError });
+        if (!isLogin) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email?.trim() || !emailRegex.test(email)) {
+                emailError = "Invalid email";
+            }
+        }
+        if (passwordError || usernameError || emailError) {
+            handleInfoChange({ passwordError, usernameError, emailError });
             return;
         }
         let res;
         if (isLogin) {
             res = await login({ username, password });
         } else {
-            res = await signup({ username, password });
+            res = await signup({ username, password, email });
         }
         if (res?.user) {
-            handleUserChange(res.user);
+            setUser({ ...res.user, token: res.token });
+            initSocket();
         }
         handleInfoChange({ error: res.message });
     };
@@ -81,6 +102,25 @@ const Login = ({ handleUserChange }) => {
                     {info?.error}
                 </p>
             )}
+            {!info?.isLogin && (
+                <div className="w-full flex flex-col gap-1">
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={info?.email}
+                        onChange={(e) =>
+                            handleInfoChange({ email: e.target.value })
+                        }
+                        className="w-full h-10 bg-zinc-600 rounded-xl text-white indent-4 focus:outline-none"
+                    />
+                    {info?.emailError && (
+                        <p className="text-sm text-center leading-none text-red-400">
+                            {info?.emailError}
+                        </p>
+                    )}
+                </div>
+            )}
+
             <div className="w-full flex flex-col gap-1">
                 <input
                     type="text"
